@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>WebGIS Fasilitas Umum Desa Ngolodono Kecamatan Karangdowo</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <!-- Font Awesome icons (free version)-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+  <!-- Google fonts-->
+  <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+    rel="stylesheet" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+
+  <!-- Mapbox GL JS -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+
+  <!-- Mapbox Directions -->
+  <script
+    src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
+  <link rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" />
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #F5F0E8;
+    }
+
+    /* Custom Blue, Mint, and Krem Theme */
+    .text-blue {
+      color: #1B4F72 !important;
+    }
+
+    .text-mint {
+      color: #A8D8B9 !important;
+    }
+
+    .bg-blue {
+      background-color: #1B4F72 !important;
+    }
+
+    .bg-mint {
+      background-color: #A8D8B9 !important;
+    }
+
+    .bg-cream {
+      background-color: #F5F0E8 !important;
+    }
+
+    .navbar {
+      background-color: #1B4F72 !important;
+      border-bottom: 2px solid #A8D8B9;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+      box-shadow: 0 4px 6px -1px rgba(27, 79, 114, 0.15);
+    }
+
+    .navbar-brand {
+      color: #FFFFFF !important;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .nav-link {
+      color: #FFFFFF !important;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #A8D8B9 !important;
+    }
+
+    .btn-primary {
+      background-color: #A8D8B9 !important;
+      border-color: #A8D8B9 !important;
+      color: #1B4F72 !important;
+      font-weight: bold;
+      transition: all 0.3s;
+      border: none !important;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+      background-color: #8ccba2 !important;
+      color: #1B4F72 !important;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 5px;
+      border: none;
+    }
+
+    #fly {
+      display: block;
+      position: absolute !important;
+      bottom: 30px !important;
+      right: 10px !important;
+      margin: 0 !important;
+      height: 35px;
+      padding: 0 15px;
+      border-radius: 5px;
+      border: 2px solid #A8D8B9 !important;
+      font-size: 13px;
+      text-align: center;
+      color: #ffffff !important;
+      background: #1B4F72 !important;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 10;
+    }
+
+    #fly:hover {
+      background: #154360;
+      color: #ffffff;
+      border-color: #A8D8B9;
+    }
+
+    .mapboxgl-popup {
+      max-width: 400px;
+      font: 13px/20px 'Poppins', sans-serif;
+    }
+
+    .mapboxgl-popup-content {
+      background-color: #F5F0E8 !important;
+      color: #1B4F72 !important;
+      border: 1px solid #1B4F72;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+      border-top-color: #F5F0E8 !important;
+    }
+
+    .legend {
+      margin: 20px 20px;
+      background-color: rgba(245, 240, 232, 0.9);
+      color: #1B4F72;
+      border: 1px solid #1B4F72;
+      border-radius: 5px;
+      bottom: 30px;
+      box-shadow: 0 4px 6px rgba(27, 79, 114, 0.15);
+      padding: 15px;
+      font: 12px/20px 'Poppins', sans-serif;
+      position: absolute;
+      left: 10px;
+      z-index: 1;
+    }
+
+    .legend h4 {
+      margin: 0 0 12px;
+      color: #1B4F72;
+      border-bottom: 1px solid #1B4F72;
+      padding-bottom: 5px;
+    }
+
+    .legend div {
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .legend div span {
+      border-radius: 50%;
+      display: inline-block;
+      height: 12px;
+      margin-right: 8px;
+      width: 12px;
+      border: 1px solid #ccc;
+    }
+
+    #home.masthead.bg-image {
+      background-image: linear-gradient(to bottom,
+          rgba(168, 216, 185, 0.4) 0%,
+          rgba(27, 79, 114, 0.9) 100%),
+        url('assets/img/bg.webp') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+    }
+
+    #home.masthead.bg-image h1 {
+      color: #A8D8B9 !important;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    #home.masthead.bg-image h2 {
+      color: #FFFFFF !important;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    footer {
+      background-color: #1B4F72;
+      color: #ffffff;
+      text-align: center;
+      padding: 25px;
+    }
+
+    footer p {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    /* General components styling overrides */
+    #about.about-section {
+      background: #1B4F72 !important;
+      color: #FFFFFF !important;
+      border-bottom: 1px solid #154360;
+    }
+
+    .projects-section {
+      background-color: #F5F0E8 !important;
+    }
+
+    .team-card {
+      background: #ffffff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+      border: none;
+      max-width: 350px;
+      margin: 0 auto;
+    }
+
+    .team-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .team-img-container {
+      position: relative;
+      height: 350px;
+      overflow: hidden;
+    }
+
+    .team-img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .team-info {
+      padding: 25px;
+      background: #ffffff;
+      border-bottom: 5px solid #A8D8B9;
+    }
+
+    .contact-form-container {
+      background-color: #154360;
+      background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+      /* Subtle texture */
+      color: white;
+      padding: 80px 0;
+      position: relative;
+    }
+
+    .form-control-custom {
+      background-color: white !important;
+      border: none !important;
+      padding: 15px !important;
+      border-radius: 5px !important;
+      margin-bottom: 20px !important;
+      font-size: 14px !important;
+    }
+
+    .btn-send {
+      background-color: #f1c40f !important;
+      /* Yellowish like the image */
+      color: #1B4F72 !important;
+      font-weight: bold !important;
+      padding: 15px 40px !important;
+      border-radius: 5px !important;
+      transition: all 0.3s !important;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .team-card-aesthetic {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      border: 1px solid rgba(27, 79, 114, 0.1);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .team-card-aesthetic:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 20px 45px rgba(27, 79, 114, 0.15);
+      border-color: #1B4F72;
+    }
+
+    .profile-img-aesthetic {
+      width: 180px;
+      height: 180px;
+      border-radius: 30px;
+      object-fit: cover;
+      margin-bottom: 25px;
+      border: 5px solid white;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ===== HUBUNGI KAMI SECTION ===== */
+    .hubungi-section {
+      background: linear-gradient(135deg, #1B4F72 0%, #2980B9 100%);
+      padding: 80px 0;
+    }
+
+    .hubungi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 50px;
+      max-width: 700px;
+      margin: 0 auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .hubungi-card .section-badge {
+      display: inline-block;
+      background: #A8D8B9;
+      color: #1B4F72;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+
+    .hubungi-card h3 {
+      color: #1B4F72;
+      font-weight: 800;
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .hubungi-card p.subtitle {
+      color: #6c757d;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .hubungi-card .form-group {
+      margin-bottom: 20px;
+    }
+
+    .hubungi-card .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #1B4F72;
+      margin-bottom: 6px;
+    }
+
+    .hubungi-card .form-control {
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      transition: border-color 0.25s;
+      color: #2C3E50;
+      background: #fafafa;
+    }
+
+    .hubungi-card .form-control:focus {
+      border-color: #1B4F72;
+      box-shadow: 0 0 0 3px rgba(27, 79, 114, 0.1);
+      background: #fff;
+    }
+
+    .hubungi-card .btn-kirim {
+      background: #1B4F72;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 32px;
+      font-weight: 700;
+      font-size: 15px;
+      width: 100%;
+      transition: all 0.3s;
+      letter-spacing: 0.5px;
+    }
+
+    .hubungi-card .btn-kirim:hover {
+      background: #154360;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(27, 79, 114, 0.3);
+    }
+
+    .hubungi-meta {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .hubungi-meta .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+    }
+
+    .hubungi-meta .meta-item i {
+      color: #A8D8B9;
+      font-size: 1rem;
+    }
+  </style>
+
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<body id="page-top">
+  <!-- Navigation-->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+    <div class="container px-4 px-lg-5">
+      <a class="navbar-brand" href="#home">WebGIS Desa Ngolodono</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#peta">Peta</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Tim</a></li>
+          <li class="nav-item"><a class="nav-link" href="#whatsapp">Hubungi Kami</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header / Masthead -->
+  <header class="masthead bg-image" id="home">
+    <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+      <div class="d-flex justify-content-center">
+        <div class="text-center">
+          <h1 class="mx-auto my-0 text-uppercase" style="font-size: 2.5rem; font-weight: bold;">WebGIS Fasilitas Umum
+            Desa Ngolodono Kecamatan Karangdowo</h1>
+          <h2 class="mx-auto mt-2 mb-5" style="letter-spacing: 1px;">Desa Ngolodono, Kecamatan Karangdowo, Kabupaten
+            Klaten</h2>
+          <a class="btn btn-primary" href="#peta">Lihat Peta</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Section About -->
+  <section class="about-section text-center pt-5 pb-5" id="about">
+    <div class="container px-4 px-lg-5 mt-5 mb-5">
+      <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-lg-10">
+          <h2 class="mb-4" style="font-weight: bold; letter-spacing: 1px; color: #A8D8B9;">Tentang WebGIS Ini</h2>
+
+          <p class="mb-4" style="line-height: 1.8; text-align: justify; font-size: 15px;">
+            WebGIS ini merupakan Sistem Informasi Geografis berbasis web yang
+            menampilkan persebaran fasilitas umum di sekitar tempat tinggal
+            di Desa Ngolodono, Kecamatan Karangdowo, Kabupaten Klaten,
+            Jawa Tengah.
+          </p>
+
+          <p
+            style="line-height: 1.8; text-align: justify; font-size: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+            Peta interaktif ini memuat berbagai fasilitas umum meliputi
+            sarana pendidikan, tempat ibadah, fasilitas kesehatan, kantor
+            pemerintahan, dan fasilitas umum lainnya yang berada di
+            lingkungan sekitar Desa Ngolodono.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Peta -->
+  <section id="peta" class="projects-section">
+    <div class="container px-4 px-lg-5">
+      <h2 class="text-center mb-4 text-blue font-weight-bold">
+        Peta Lokasi <span style="color: #A8D8B9;">Fasilitas Umum</span>
+      </h2>
+      <div class="row">
+
+        <!-- Kolom Petunjuk (kiri) -->
+        <div class="col-lg-3">
+          <div class="card mb-4 bg-cream text-dark border-blue shadow-sm" style="border: 1px solid #1B4F72 !important;">
+            <div class="card-header border-bottom border-blue bg-blue text-white"
+              style="font-weight: bold; background-color: #1B4F72 !important;">Petunjuk
+              Penggunaan</div>
+            <div class="card-body p-3">
+              <ol class="small ps-3 mb-0" style="color: #1B4F72; line-height: 1.8;">
+                <li>Gunakan tombol zoom in/out dan reset bearing untuk mengatur posisi peta.</li>
+                <li>Titik biru (<strong>A</strong>) adalah titik lokasi Anda.</li>
+                <li>Klik tombol
+                  <span
+                    style="background:#1B4F72;color:#fff;border-radius:3px;font-size:11px;padding:1px 6px;font-weight:bold;white-space:nowrap;">
+                    Lokasi Rumah
+                  </span>
+                  untuk menampilkan lokasi rumah.
+                </li>
+                <li>Klik salah satu bangunan sebagai tujuan destinasi.</li>
+                <li>Rute ditampilkan sebagai garis biru pada peta.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Peta (kanan) -->
+        <div class="col-lg-9">
+          <div class="card mb-4" style="border: 2px solid #1B4F72; border-radius: 8px; overflow: hidden;">
+            <div class="card-body p-0" style="height: 510px; position: relative;">
+              <div id="map"></div>
+              <button id="fly">Lokasi Rumah</button>
+              <div id="state-legend" class="legend">
+                <h4 style="font-weight: bold;">Legenda</h4>
+                <div><span style="background-color: #1B4F72;"></span>Pendidikan</div>
+                <div><span style="background-color: #A8D8B9;"></span>Ibadah</div>
+                <div><span style="background-color: #E74C3C;"></span>Kesehatan</div>
+                <div><span style="background-color: #F39C12;"></span>Pemerintahan</div>
+                <div><span style="background-color: #8E44AD;"></span>Keuangan</div>
+                <div><span style="background-color: #2ECC71;"></span>Pelayanan</div>
+                <div><span style="background-color: #E67E22;"></span>Fasilitas Umum</div>
+                <div><span style="background-color: #E74C3C;"></span>Rumah</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact (Preserved from template based on link in Navbar) -->
+  <!-- Section Tim -->
+  <!-- Section Tim (Aesthetic Redesign) -->
+  <section class="team-section py-5" id="contact"
+    style="background-color: #ffffff; position: relative; overflow: hidden;">
+    <div class="container px-4 px-lg-5">
+      <div class="row align-items-center">
+        <div class="col-lg-5 mb-5 mb-lg-0">
+          <h2 class="display-4 font-weight-bold" style="color: #1B4F72; line-height: 1.2;">The Brain Behind <br><span
+              style="color: #A8D8B9;">The WebGIS</span></h2>
+          <p class="lead text-muted mt-4">Berdedikasi untuk menyediakan solusi pemetaan digital yang akurat dan mudah
+            diakses bagi masyarakat Desa Ngolodono.</p>
+          <div class="mt-5 d-flex align-items-center">
+            <div style="width: 50px; height: 3px; background: #1B4F72; margin-right: 20px;"></div>
+            <span class="text-uppercase font-weight-bold" style="letter-spacing: 2px; color: #1B4F72;">Expertise &
+              Passion</span>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="team-card-aesthetic text-center">
+            <img src="assets/img/foto.jpeg" class="profile-img-aesthetic" alt="Vera Agustin">
+            <h3 style="color: #1B4F72; font-weight: bold;">Vera Agustin Dwi Maharani</h3>
+            <p class="text-mint font-weight-bold" style="letter-spacing: 3px; font-size: 14px;">LEAD DEVELOPER •
+              117230025</p>
+            <p class="text-muted mt-3 mb-4 px-lg-5">"Inovasi digital adalah jembatan menuju kemajuan desa yang inklusif
+              dan transparan."</p>
+            <div class="social-links mt-4">
+              <a href="#!" class="mx-3 text-blue" style="font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+              <a href="#!" class="mx-3 text-blue" style="font-size: 1.2rem;"><i class="fab fa-linkedin"></i></a>
+              <a href="#!" class="mx-3 text-blue" style="font-size: 1.2rem;"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Hubungi Kami -->
+  <section id="whatsapp" class="hubungi-section">
+    <div class="container px-4 px-lg-5">
+      <div class="hubungi-card">
+        <div class="text-center mb-2">
+          <span class="section-badge">Hubungi Kami</span>
+        </div>
+        <h3 class="text-center">Kirim Pesan via WhatsApp</h3>
+        <p class="subtitle text-center">Isi formulir di bawah dan pesan akan langsung dikirim ke WhatsApp kami.</p>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-control" id="wa_name" placeholder="Tulis nama Anda...">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">Nomor Telepon</label>
+              <input type="text" class="form-control" id="wa_phone" placeholder="Nomor aktif Anda...">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label class="form-label">Email <span style="color:#aaa; font-weight:400;">(opsional)</span></label>
+              <input type="email" class="form-control" id="wa_email" placeholder="email@contoh.com">
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label class="form-label">Pesan</label>
+              <textarea class="form-control" id="wa_message" rows="4"
+                placeholder="Tuliskan pertanyaan atau pesan Anda di sini..."></textarea>
+            </div>
+          </div>
+          <div class="col-12 mt-2">
+            <button class="btn-kirim" onclick="sendToWA()">
+              <i class="fab fa-whatsapp me-2"></i> Kirim Pesan Sekarang
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info kontak di bawah card -->
+      <div class="hubungi-meta">
+        <div class="meta-item">
+          <i class="fab fa-whatsapp"></i>
+          <span>+62 858-4206-3910</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Desa Ngolodono, Karangdowo, Klaten</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-university"></i>
+          <span>Teknologi Mineral dan Energi</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function sendToWA() {
+      const name = document.getElementById('wa_name').value;
+      const email = document.getElementById('wa_email').value;
+      const phone = document.getElementById('wa_phone').value;
+      const message = document.getElementById('wa_message').value;
+
+      if (!name || !message) {
+        alert("Mohon isi Nama dan Pesan terlebih dahulu.");
+        return;
+      }
+
+      const whatsappNumber = "6285842063910";
+      const fullMessage = `Halo Admin WebGIS Desa Ngolodono, saya ingin menyampaikan pesan:%0A%0ANama: ${name}%0AEmail: ${email}%0AHP: ${phone}%0APesan: ${message}`;
+
+      window.open(`https://wa.me/${whatsappNumber}?text=${fullMessage}`, '_blank');
+    }
+  </script>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p class="m-0 text-center">
+        Copyright &copy; WebGIS Desa Ngolodono 2024
+      </p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap core JS-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Core theme JS-->
+  <script src="js/scripts.js"></script>
+
+  <script>
+    // Access Token
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYWRpc3RhcHMiLCJhIjoiY21uaWZmcWM3MGNlOTJxcTJqNG1xMTM5bCJ9.OwSxA7wesWJUNJWz3D127A';
+
+    // Posisi awal dan akhir untuk fly
+    const start = {
+      center: [110.736481, -7.697405],
+      zoom: 13,
+      pitch: 0,
+      bearing: 0
+    };
+    const end = {
+      center: [110.736481, -7.697405],
+      zoom: 16,
+      bearing: 0,
+      pitch: 0
+    };
+
+    // Inisialisasi Map
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [110.736481, -7.697405],
+      zoom: 14
+    });
+
+    map.on('load', () => {
+      // Load GeoJSON Fasilitas
+      map.addSource('fasilitas', {
+        type: 'geojson',
+        data: 'assets/geojson/fasilitas_ngolodono.geojson'
+      });
+
+      map.addLayer({
+        id: 'fasilitas-fill',
+        type: 'fill',
+        source: 'fasilitas',
+        paint: {
+          'fill-color': [
+            'match', ['get', 'kategori'],
+            'Pendidikan', '#1B4F72',
+            'Ibadah', '#A8D8B9',
+            'Kesehatan', '#E74C3C',
+            'Pemerintahan', '#F39C12',
+            'Keuangan', '#8E44AD',
+            'Pelayanan', '#2ECC71',
+            'Fasilitas Umum', '#E67E22',
+            '#888888'
+          ],
+          'fill-opacity': 0.8
+        }
+      });
+
+      map.addLayer({
+        id: 'fasilitas-outline',
+        type: 'line',
+        source: 'fasilitas',
+        paint: {
+          'line-color': '#000000',
+          'line-width': 1
+        }
+      });
+
+      // Popup
+      const popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: true
+      });
+
+      map.on('mouseenter', 'fasilitas-fill', (e) => {
+        map.getCanvas().style.cursor = 'pointer';
+        var feature = e.features[0];
+        popup.setLngLat(e.lngLat)
+          .setHTML('<strong>' + feature.properties.nama + '</strong><br>' + feature.properties.kategori)
+          .addTo(map);
+      });
+
+      map.on('mouseleave', 'fasilitas-fill', () => {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+      });
+
+      // Marker rumah klien
+      const markerEl = document.createElement('div');
+      markerEl.style.cssText = `
+        width: 20px;
+        height: 20px;
+        background: #E74C3C;
+        border: 3px solid #FFFFFF;
+        border-radius: 50%;
+        box-shadow: 0 0 6px rgba(0,0,0,0.4);
+        cursor: pointer;
+      `;
+
+      new mapboxgl.Marker(markerEl)
+        .setLngLat([110.736481, -7.697405])
+        .setPopup(new mapboxgl.Popup().setHTML(
+          '<strong>Rumah Klien</strong><br>Desa Ngolodono, Karangdowo'
+        ))
+        .addTo(map);
+
+      // Directions / Routing
+      var directions = new MapboxDirections({
+        accessToken: mapboxgl.accessToken,
+        unit: 'metric',
+        profile: 'mapbox/driving',
+        language: 'id'
+      });
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          directions.setOrigin([
+            position.coords.longitude,
+            position.coords.latitude
+          ]);
+        });
+      }
+      map.addControl(directions, 'top-right');
+    });
+
+    // Navigation Control
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+    // Tombol Fly
+    let isAtStart = true;
+    document.getElementById('fly').addEventListener('click', () => {
+      const target = isAtStart ? end : start;
+      isAtStart = !isAtStart;
+      map.flyTo({
+        ...target,
+        duration: 2000,
+        essential: true
+      });
+    });
+  </script>
+</body>
+
+</html>
