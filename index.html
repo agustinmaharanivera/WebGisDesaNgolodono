@@ -718,6 +718,75 @@
       zoom: 14
     });
 
+    // Global variables
+    let directions;
+    let markerA = new mapboxgl.Marker({ color: '#1B4F72' });
+    let markerB = new mapboxgl.Marker({ color: '#E74C3C' });
+
+    // Fungsi Utama: Ambil Rute Langsung dari API Mapbox (Solusi Pasti)
+    async function getRouteManual(destination) {
+      if (!directions) return;
+      
+      const originCoord = [110.736481, -7.697405]; // Rumah Klien
+      const destCoord = destination;
+
+      try {
+        const query = await fetch(
+          `https://api.mapbox.com/directions/v5/mapbox/driving/${originCoord[0]},${originCoord[1]};${destCoord[0]},${destCoord[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`,
+          { method: 'GET' }
+        );
+        const json = await query.json();
+        if (!json.routes || json.routes.length === 0) return;
+        
+        const routeData = json.routes[0].geometry.coordinates;
+        const geojson = {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: routeData
+          }
+        };
+
+        // Render Garis Rute
+        if (map.getSource('route-manual')) {
+          map.getSource('route-manual').setData(geojson);
+        } else {
+          map.addSource('route-manual', { type: 'geojson', data: geojson });
+          map.addLayer({
+            id: 'route-manual-layer',
+            type: 'line',
+            source: 'route-manual',
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: {
+              'line-color': '#1B4F72',
+              'line-width': 10,
+              'line-opacity': 0.85
+            }
+          });
+        }
+
+        // Render Penanda A dan B
+        markerA.setLngLat(routeData[0]).addTo(map);
+        markerB.setLngLat(routeData[routeData.length - 1]).addTo(map);
+
+        // Auto Zoom ke Rute
+        const bounds = new mapboxgl.LngLatBounds();
+        routeData.forEach(c => bounds.extend(c));
+        map.fitBounds(bounds, { padding: 80 });
+      } catch (err) {
+        console.error('Gagal mengambil rute:', err);
+      }
+    }
+
+    // Global function for setting destination from popup
+    window.setAsDestination = (lng, lat) => {
+      if (directions) {
+        directions.setDestination([lng, lat]);
+        getRouteManual([lng, lat]);
+      }
+    };
+
     map.on('load', () => {
       // Load GeoJSON Fasilitas
       map.addSource('fasilitas', {
@@ -763,15 +832,30 @@
 
       map.on('mouseenter', 'fasilitas-fill', (e) => {
         map.getCanvas().style.cursor = 'pointer';
-        var feature = e.features[0];
-        popup.setLngLat(e.lngLat)
-          .setHTML('<strong>' + feature.properties.nama + '</strong><br>' + feature.properties.kategori)
-          .addTo(map);
       });
 
       map.on('mouseleave', 'fasilitas-fill', () => {
         map.getCanvas().style.cursor = '';
-        popup.remove();
+      });
+
+      map.on('click', 'fasilitas-fill', (e) => {
+        var feature = e.features[0];
+        var coords = e.lngLat;
+        
+        new mapboxgl.Popup()
+          .setLngLat(coords)
+          .setHTML(`
+            <div style="text-align: center; padding: 5px;">
+              <strong style="display: block; margin-bottom: 5px; font-size: 14px;">${feature.properties.nama}</strong>
+              <span style="color: #666; font-size: 12px;">${feature.properties.kategori}</span>
+              <hr style="margin: 8px 0;">
+              <button class="btn btn-primary btn-sm" style="width: 100%; font-weight: bold; font-size: 11px;" 
+                onclick="setAsDestination(${coords.lng}, ${coords.lat})">
+                <i class="fas fa-route me-1"></i> Rute ke Sini
+              </button>
+            </div>
+          `)
+          .addTo(map);
       });
 
       // Marker rumah klien
@@ -794,21 +878,20 @@
         .addTo(map);
 
       // Directions / Routing
-      var directions = new MapboxDirections({
+      directions = new MapboxDirections({
         accessToken: mapboxgl.accessToken,
         unit: 'metric',
         profile: 'mapbox/driving',
-        language: 'id'
+        language: 'id',
+        interactive: true,
+        flyTo: true
       });
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-          directions.setOrigin([
-            position.coords.longitude,
-            position.coords.latitude
-          ]);
-        });
-      }
+      
+      // Tambahkan control dulu supaya plugin terikat ke peta
       map.addControl(directions, 'top-right');
+
+      // Set default origin ke lokasi rumah klien
+      directions.setOrigin([110.736481, -7.697405]);
     });
 
     // Navigation Control
